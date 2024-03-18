@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>URL Shortener</title>
+    <style type="text/css" media="screen">
+      body {
+          padding: 2em;
+      }
+      h1 {
+          margin-bottom: 1em;
+      }
+      input {
+          padding: 1em;
+          width: 50em; 
+          border-radius: 0.5em;
+          margin-right: 1em;
+      }
+      button {
+          padding: 1em;
+      }
+      #result-container {
+          display: none;
+          margin-top: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>URL Shortener</h1>
+    <form id="main-form">
+      <input type="text" name="url" value="" placeholder="https://yourlong.url" />
+      <button type="submit">Short it!</button>
+    </form>
+    <div id="result-container">
+      Your short url is: <a target="_blank" id="result"></a>
+    </div>
+    <script>
+      const form = document.getElementById("main-form");
+      form.addEventListener("submit", postData);
+
+      async function postData(event) {
+          event.preventDefault();
+
+          const data = {
+              url: document.getElementsByName("url")[0].value
+          };
+          const response = await fetch("/", {
+              method: "POST", 
+              mode: "same-origin",
+              cache: "no-cache",
+              credentials: "same-origin", 
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              redirect: "follow", 
+              referrerPolicy: "no-referrer", 
+              body: JSON.stringify(data),
+          });
+
+          if (!response.ok) {
+              const message = await response.text();
+              alert(message);
+              return;
+          }
+
+          const result = await response.json();
+          document.getElementById("result-container").style.display = "block";
+          const resultDOM = document.getElementById("result");
+          resultDOM.href = "//" + result.url;
+          resultDOM.innerText = result.url;
+      }
+    </script>
+  </body>
+</html>
